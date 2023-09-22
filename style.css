@@ -1,0 +1,36 @@
+.row {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(240, 226, 27);
+  height: 500px;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ril {
+  width: 400px;
+  padding: 20px;
+  margin: 50px;
+  box-shadow: 20px 20px 20px red;
+  display: inline;
+}
+button {
+  background-color: gray;
+  width: 100px;
+  height: 30px;
+  border-radius: 50px;
+}
+button:hover {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+th,
+td {
+  width: 200px;
+  text-align: center;
+}
