@@ -1,0 +1,115 @@
+Microsoft Windows [Version 10.0.22621.2283]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\ASUS>
+
+C:\Users\ASUS>\xampp\mysql\bin
+'\xampp\mysql\bin' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\ASUS>mysql -u root -p
+'mysql' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\Users\ASUS>cd \xampp\mysql\bin
+
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 9
+Server version: 10.4.27-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| akademik           |
+| ci-blog            |
+| ci4                |
+| ci4hotel           |
+| ci4login           |
+| db_perpustakaan    |
+| defood             |
+| information_schema |
+| mysql              |
+| pegawaimsib5       |
+| penjualandb        |
+| performance_schema |
+| perpustakaan       |
+| phpmyadmin         |
+| test               |
+| tokomsib5          |
++--------------------+
+16 rows in set (0.002 sec)
+
+MariaDB [(none)]> CREATE DATABASE dbpegawai;
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [(none)]> USE dbpegawai;
+Database changed
+MariaDB [dbpegawai]> show tables;
+Empty set (0.001 sec)
+
+MariaDB [dbpegawai]> CREATE TABLE pegawai(
+    -> id int primary key,
+    -> nip char(5) not null uniqe,
+    -> nama varchar(30) not null,
+    -> gender enum('L','P') not null,
+    -> umur int not null,
+    -> berat_badan float);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '
+nama varchar(30) not null,
+gender enum('L','P') not null,
+umur int not null,...' at line 3
+MariaDB [dbpegawai]> CREATE TABLE pegawai (
+    ->     id INT PRIMARY KEY,
+    ->     nip CHAR(5) NOT NULL UNIQUE,
+    ->     nama VARCHAR(30) NOT NULL,
+    ->     gender ENUM('L','P') NOT NULL,
+    ->     umur INT NOT NULL,
+    ->     berat_badan FLOAT
+    -> );
+Query OK, 0 rows affected (0.027 sec)
+
+MariaDB [dbpegawai]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| akademik           |
+| ci-blog            |
+| ci4                |
+| ci4hotel           |
+| ci4login           |
+| db_perpustakaan    |
+| dbpegawai          |
+| defood             |
+| information_schema |
+| mysql              |
+| pegawaimsib5       |
+| penjualandb        |
+| performance_schema |
+| perpustakaan       |
+| phpmyadmin         |
+| test               |
+| tokomsib5          |
++--------------------+
+17 rows in set (0.005 sec)
+
+MariaDB [dbpegawai]> DESCRIBE pegawai;
++-------------+---------------+------+-----+---------+-------+
+| Field       | Type          | Null | Key | Default | Extra |
++-------------+---------------+------+-----+---------+-------+
+| id          | int(11)       | NO   | PRI | NULL    |       |
+| nip         | char(5)       | NO   | UNI | NULL    |       |
+| nama        | varchar(30)   | NO   |     | NULL    |       |
+| gender      | enum('L','P') | NO   |     | NULL    |       |
+| umur        | int(11)       | NO   |     | NULL    |       |
+| berat_badan | float         | YES  |     | NULL    |       |
++-------------+---------------+------+-----+---------+-------+
+6 rows in set (0.020 sec)
+
+MariaDB [dbpegawai]>
