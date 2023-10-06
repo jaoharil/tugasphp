@@ -1,0 +1,152 @@
+Microsoft Windows [Version 10.0.22621.2283]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\ASUS>cd \xampp\mysql\bin
+
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 8
+Server version: 10.4.27-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| akademik           |
+| ci-blog            |
+| ci4                |
+| ci4hotel           |
+| ci4login           |
+| db_perpustakaan    |
+| dbpegawai          |
+| defood             |
+| information_schema |
+| mysql              |
+| pegawaimsib5       |
+| penjualandb        |
+| performance_schema |
+| perpustakaan       |
+| phpmyadmin         |
+| test               |
+| tokomsib5          |
++--------------------+
+17 rows in set (0.079 sec)
+
+MariaDB [(none)]>  CREATE DATABASE dbpegawai;
+ERROR 1007 (HY000): Can't create database 'dbpegawai'; database exists
+MariaDB [(none)]> USE dbpegawai;
+Database changed
+MariaDB [dbpegawai]> CREATE TABLE produk (
+    ->     id int PRIMARY KEY AUTO_INCREMENT,
+    ->     nama varchar(30) NOT NULL UNIQUE,
+    ->     harga double NOT NULL,
+    ->     stok int NOT NULL,
+    ->     idjenis int NOT NULL REFERENCES jenis(id),
+    ->     foto varchar(30));
+Query OK, 0 rows affected (0.047 sec)
+
+MariaDB [dbpegawai]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| akademik           |
+| ci-blog            |
+| ci4                |
+| ci4hotel           |
+| ci4login           |
+| db_perpustakaan    |
+| dbpegawai          |
+| defood             |
+| information_schema |
+| mysql              |
+| pegawaimsib5       |
+| penjualandb        |
+| performance_schema |
+| perpustakaan       |
+| phpmyadmin         |
+| test               |
+| tokomsib5          |
++--------------------+
+17 rows in set (0.005 sec)
+
+MariaDB [dbpegawai]> INSERT INTO produk (nama, harga, stok, idjenis, foto) VALUES ('TV',200000,3,1,'tv.jpg'), ('Meja',1000000,3,2,'meja.jpg');
+Query OK, 2 rows affected (0.058 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpegawai]> DESCRIBE produk;
++---------+-------------+------+-----+---------+----------------+
+| Field   | Type        | Null | Key | Default | Extra
+|
++---------+-------------+------+-----+---------+----------------+
+| id      | int(11)     | NO   | PRI | NULL    | auto_increment |
+| nama    | varchar(30) | NO   | UNI | NULL    |
+|
+| harga   | double      | NO   |     | NULL    |
+|
+| stok    | int(11)     | NO   |     | NULL    |
+|
+| idjenis | int(11)     | NO   |     | NULL    |
+|
+| foto    | varchar(30) | YES  |     | NULL    |
+|
++---------+-------------+------+-----+---------+----------------+
+6 rows in set (0.023 sec)
+MariaDB [dbpegawai]> SELECT * FROM produk;
++----+------+---------+------+---------+----------+
+| id | nama | harga   | stok | idjenis | foto     |
++----+------+---------+------+---------+----------+
+|  1 | TV   |  200000 |    3 |       1 | tv.jpg   |
+|  2 | Meja | 1000000 |    3 |       2 | meja.jpg |
++----+------+---------+------+---------+----------+
+2 rows in set (0.007 sec)
+MariaDB [dbpegawai]> INSERT INTO vendor (nomor, nama, kota, kontak) VALUES
+    ->     (1, 'Vendor A', 'Kota A', 'Kontak A'),
+    ->     (2, 'Vendor B', 'Kota B', 'Kontak B'),
+    ->     (3, 'Vendor C', 'Kota C', 'Kontak C'),
+    ->     (4, 'Vendor D', 'Kota D', 'Kontak D'),
+    ->     (5, 'Vendor E', 'Kota E', 'Kontak E');
+Query OK, 5 rows affected (0.004 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpegawai]> SELECT * FROM vendor;
++-------+----------+--------+----------+
+| nomor | nama     | kota   | kontak   |
++-------+----------+--------+----------+
+|     1 | Vendor A | Kota A | Kontak A |
+|     2 | Vendor B | Kota B | Kontak B |
+|     3 | Vendor C | Kota C | Kontak C |
+|     4 | Vendor D | Kota D | Kontak D |
+|     5 | Vendor E | Kota E | Kontak E |
++-------+----------+--------+----------+
+5 rows in set (0.000 sec)
+
+MariaDB [dbpegawai]> CREATE TABLE pembelian (
+    ->     tanggal DATE,
+    ->     nomor INT PRIMARY KEY,
+    ->     produk_id INT,
+    ->     jumlah INT,
+    ->     harga DECIMAL(10, 2),
+    ->     vendor_id INT,
+    ->     FOREIGN KEY (produk_id) REFERENCES produk(id),
+    ->     FOREIGN KEY (vendor_id) REFERENCES vendor(nomor)
+    -> );
+Query OK, 0 rows affected (0.023 sec)
+MariaDB [dbpegawai]> INSERT INTO pembelian (tanggal, nomor, produk_id, jumlah, harga, vendor_id) VALUES
+    ->     ('2023-10-01', 101, 1, 10, 500, 1),
+    ->     ('2023-10-02', 102, 2, 5, 250, 2);
+Query OK, 2 rows affected (0.004 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+MariaDB [dbpegawai]> SELECT * FROM pembelian;
++------------+-------+-----------+--------+--------+-----------+
+| tanggal    | nomor | produk_id | jumlah | harga  | vendor_id |
++------------+-------+-----------+--------+--------+-----------+
+| 2023-10-01 |   101 |         1 |     10 | 500.00 |         1 |
+| 2023-10-02 |   102 |         2 |      5 | 250.00 |         2 |
++------------+-------+-----------+--------+--------+-----------+
+2 rows in set (0.000 sec)
