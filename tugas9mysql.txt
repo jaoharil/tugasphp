@@ -1,0 +1,194 @@
+Microsoft Windows [Version 10.0.22621.2428]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\ASUS>cd \xampp\mysql\bin
+
+C:\xampp\mysql\bin>mysql -u root -p
+Enter password:
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 8
+Server version: 10.4.27-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| akademik           |
+| ci-blog            |
+| ci4                |
+| ci4hotel           |
+| ci4login           |
+| db                 |
+| db_perpustakaan    |
+| db_pos3            |
+| dbpegawai          |
+| dbpos              |
+| dbpos3             |
+| defood             |
+| information_schema |
+| mysql              |
+| pegawaimsib5       |
+| penjualandb        |
+| performance_schema |
+| perpustakaan       |
+| phpmyadmin         |
+| test               |
+| tokomsib5          |
++--------------------+
+21 rows in set (0.041 sec)
+
+MariaDB [(none)]> USE dbpos3;
+Database changed
+MariaDB [dbpos3]> show tables;
++-------------------------+
+| Tables_in_dbpos3        |
++-------------------------+
+| jenis_produk            |
+| kartu                   |
+| pelanggan               |
+| pembayaran              |
+| pembelian               |
+| pembelian_produk_vendor |
+| pesanan                 |
+| pesanan_items           |
+| pesanan_pelanggan_kartu |
+| produk                  |
+| vendor                  |
++-------------------------+
+11 rows in set (0.003 sec)
+
+MariaDB [dbpos3]> DELIMITER $$
+MariaDB [dbpos3]> CREATE FUNCTION kategori_harga(
+    -> harga DOUBLE) RETURNS VARCHAR(25)
+    -> BEGIN
+    -> DECLARE kategori VARCHAR(25);
+    -> IF harga <= 500 THEN SET kategori = 'murah';
+    -> ELSEIF harga <= 3000000 THEN SET kategori = 'sedang';
+    -> ELSEIF harga <= 10000000 THEN SET kategori = 'mahal';
+    -> ELSE
+    -> SET kategori = 'sangat mahal';
+    -> END IF;
+    -> RETURN kategori;
+    -> END $$
+Query OK, 0 rows affected (0.015 sec)
+
+MariaDB [dbpos3]> DELIMITER ;
+MariaDB [dbpos3]> SELECT * FROM pesanan;
++----+------------+---------+--------------+
+| id | tanggal    | total   | pelanggan_id |
++----+------------+---------+--------------+
+|  1 | 2015-11-04 | 9720000 |            1 |
+|  2 | 2015-11-04 |   17500 |            3 |
+|  3 | 2015-11-04 |       0 |            6 |
+|  4 | 2015-11-04 |       0 |            7 |
+|  5 | 2015-11-04 |       0 |           10 |
+|  6 | 2015-11-04 |       0 |            2 |
+|  7 | 2015-11-04 |       0 |            5 |
+|  8 | 2015-11-04 |       0 |            4 |
+|  9 | 2015-11-04 |       0 |            8 |
+| 10 | 2015-11-04 |       0 |            9 |
++----+------------+---------+--------------+
+10 rows in set (0.003 sec)
+
+MariaDB [dbpos3]> SELECT * FROM pesanan_items;
++----+-----------+------------+------+---------+
+| id | produk_id | pesanan_id | qty  | harga   |
++----+-----------+------------+------+---------+
+|  1 |         1 |          1 |    1 | 5040000 |
+|  2 |         3 |          1 |    1 | 4680000 |
+|  3 |         5 |          2 |    5 |    3500 |
+|  6 |         5 |          3 |   10 |    3500 |
+|  7 |         1 |          3 |    1 | 5040000 |
+|  9 |         5 |          5 |   10 |    3500 |
+| 10 |         5 |          6 |   20 |    3500 |
++----+-----------+------------+------+---------+
+7 rows in set (0.000 sec)
+
+MariaDB [dbpos3]> SELECT qty, kategori_harga(harga) AS kategori_harga FROM pesanan_items;
++------+----------------+
+| qty  | kategori_harga |
++------+----------------+
+|    1 | mahal          |
+|    1 | mahal          |
+|    5 | sedang         |
+|   10 | sedang         |
+|    1 | mahal          |
+|   10 | sedang         |
+|   20 | sedang         |
++------+----------------+
+7 rows in set (0.005 sec)
+
+MariaDB [dbpos3]> DELIMITER $$
+MariaDB [dbpos3]> CREATE PROCEDURE kurangi_stok(IN produk_id INT, IN jumlah INT)
+    -> BEGIN
+    -> DECLARE stok_sekarang INT;
+    -> SELECT stok INTO stok_sekarang FROM produk WHERE id = produk_id;
+    -> IF stok_sekarang >= jumlah THEN
+    -> UPDATE produk SET stok = stok_sekarang - jumlah WHERE id = produk_id;
+    -> ELSE
+    -> SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stok tidak mencukupi';
+    -> END IF;
+    -> END $$
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [dbpos3]> DELIMITER ;
+MariaDB [dbpos3]> CALL kurangi_stok(1, 5);
+Query OK, 2 rows affected (0.011 sec)
+
+MariaDB [dbpos3]> SELECT * FROM produk;
++----+------+------------------+------------+------------+------+----------+-----------------+
+| id | kode | nama             | harga_beli | harga_jual | stok | min_stok | jenis_produk_id |
++----+------+------------------+------------+------------+------+----------+-----------------+
+|  1 | TV01 | Televisi 21 inch |    3500000 |    5040000 |    5 |        2 |               1 |
+|  2 | TV02 | Televisi 40 inch |    5500000 |    7440000 |    4 |        2 |               1 |
+|  3 | K001 | Kulkas 2 pintu   |    3500000 |    4680000 |    6 |        2 |               1 |
+|  4 | M001 | Meja Makan       |     500000 |     600000 |    4 |        3 |               2 |
+|  5 | TK01 | Teh Kotak        |       3000 |       3500 |    6 |       10 |               4 |
+|  6 | PC01 | PC Desktop HP    |    7000000 |    9600000 |    9 |        2 |               5 |
+|  7 | TB01 | Teh Botol        |       2000 |       2500 |   53 |       10 |               4 |
+|  8 | AC01 | Notebook Acer    |    8000000 |   10800000 |    7 |        2 |               5 |
+|  9 | LN01 | Notebook Lenovo  |    9000000 |   12000000 |    9 |        2 |               5 |
+| 10 | L004 | Laptop HP        |   12000000 |   13000000 |   20 |        5 |               5 |
+| 14 | BJ01 | Baju Batik       |     900000 |    1000000 |  100 |        2 |               2 |
+| 15 | BJ02 | Hody             |      90000 |     100000 |   90 |        2 |               2 |
+| 16 | BJ03 | Jaket            |     150000 |     200000 |  100 |        4 |               2 |
++----+------+------------------+------------+------------+------+----------+-----------------+
+13 rows in set (0.000 sec)
+
+MariaDB [dbpos3]> CALL kurangi_stok(14, 5);
+Query OK, 2 rows affected (0.004 sec)
+
+MariaDB [dbpos3]> DELIMITER $$
+MariaDB [dbpos3]> CREATE TRIGGER trig_kurangi_stok AFTER INSERT ON pesanan_items
+    -> FOR EACH ROW
+    -> BEGIN
+    -> CALL kurangi_stok(NEW.produk_id, NEW.jumlah);
+    -> END $$
+ERROR 1054 (42S22): Unknown column 'jumlah' in 'NEW'
+MariaDB [dbpos3]> DELIMITER ;
+MariaDB [dbpos3]> DELIMITER $$
+MariaDB [dbpos3]> CREATE TRIGGER trig_kurangi_stok AFTER INSERT ON pesanan_items
+    -> FOR EACH ROW
+    -> BEGIN
+    -> CALL kurangi_stok(NEW.produk_id, NEW.qty);
+    -> END $$
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [dbpos3]> DELIMITER ;
+MariaDB [dbpos3]> SELECT * FROM pesanan_items;
++----+-----------+------------+------+---------+
+| id | produk_id | pesanan_id | qty  | harga   |
++----+-----------+------------+------+---------+
+|  1 |         1 |          1 |    1 | 5040000 |
+|  2 |         3 |          1 |    1 | 4680000 |
+|  3 |         5 |          2 |    5 |    3500 |
+|  6 |         5 |          3 |   10 |    3500 |
+|  7 |         1 |          3 |    1 | 5040000 |
+|  9 |         5 |          5 |   10 |    3500 |
+| 10 |         5 |          6 |   20 |    3500 |
++----+-----------+------------+------+---------+
+7 rows in set (0.001 sec)
